@@ -50,28 +50,32 @@ export function Stars({ rating = 0, className = 'h-4 w-4' }) {
 }
 
 const TRUST = [
-  ['shield', 'Safe Payments'],
-  ['truck', 'Nationwide Delivery'],
-  ['refresh', 'Easy Return Policy'],
-  ['tag', 'Best Price Guaranteed'],
-  ['award', '100% Authentic'],
-  ['wrench', 'After-Sales Service'],
+  ['truck', 'Nationwide delivery', 'To all 64 districts'],
+  ['shield', 'Safe payments', 'Cash on delivery available'],
+  ['refresh', 'Easy returns', 'Simple return process'],
+  ['tag', 'Fair prices', 'Regular deals & discounts'],
+  ['award', '100% authentic', 'Original products only'],
+  ['wrench', 'After-sales service', 'Help after you buy'],
 ];
 
+// One continuous strip: hairline dividers come from the 1px gap over a light background
 export function TrustBar() {
   return (
-    <div className="container-x my-6 md:my-8">
-      <div className="grid grid-cols-3 gap-2 lg:grid-cols-6">
-        {TRUST.map(([icon, label]) => (
-          <div key={label} className="flex flex-col items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-2 py-2.5 text-center sm:flex-row sm:gap-2.5 sm:px-3 sm:py-3 sm:text-left">
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary/10 text-primary sm:h-9 sm:w-9">
-              <Icon name={icon} className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+    <section aria-label="Why shop with us" className="container-x my-6 md:my-8">
+      <ul className="grid grid-cols-3 gap-px overflow-hidden rounded-2xl bg-slate-200/70 ring-1 ring-slate-200/70 shadow-[0_10px_30px_-18px_rgba(15,23,42,0.35)] lg:grid-cols-6">
+        {TRUST.map(([icon, title, note]) => (
+          <li key={title} className="flex flex-col items-center gap-2 bg-white px-1.5 py-3.5 text-center md:gap-2.5 md:px-3 md:py-[18px]">
+            <span className="grid h-9 w-9 place-items-center rounded-xl bg-brand text-white md:h-10 md:w-10">
+              <Icon name={icon} className="h-[18px] w-[18px] md:h-5 md:w-5" />
             </span>
-            <span className="text-[10px] font-semibold uppercase leading-tight text-slate-700 sm:text-[11px] md:text-xs">{label}</span>
-          </div>
+            <span>
+              <span className="block text-xs font-semibold leading-tight text-slate-900 md:text-[13px]">{title}</span>
+              <span className="mt-0.5 hidden text-xs leading-tight text-slate-500 sm:block">{note}</span>
+            </span>
+          </li>
         ))}
-      </div>
-    </div>
+      </ul>
+    </section>
   );
 }
 

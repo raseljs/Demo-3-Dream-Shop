@@ -15,6 +15,8 @@ const FORMS = {
       { title: 'Brand', fields: [
         { name: 'site_title', label: 'Site Title' }, { name: 'tagline', label: 'Tagline' },
         { name: 'logo', label: 'Logo (shown on the coloured header)', type: 'image' }, { name: 'favicon', label: 'Favicon', type: 'image' },
+        { name: 'logo_light', label: 'Colour logo (for white backgrounds, e.g. the loading screen)', type: 'image' },
+        { name: 'preloader', label: 'Show the loading screen on the first visit', type: 'toggle' },
         { name: 'primary_color', label: 'Primary (button) colour', type: 'color' }, { name: 'header_color', label: 'Header colour', type: 'color' },
       ] },
       { title: 'Contact', fields: [

@@ -7,6 +7,7 @@ import CartDrawer from '@/components/store/CartDrawer';
 import RevealOnScroll from '@/components/store/RevealOnScroll';
 import ProductPreviewCapture from '@/components/store/ProductPreviewCapture';
 import FacebookPixel from '@/components/store/FacebookPixel';
+import Preloader from '@/components/store/Preloader';
 import Icon from '@/components/Icon';
 
 export default async function StoreLayout({ children }) {
@@ -16,6 +17,7 @@ export default async function StoreLayout({ children }) {
   }));
   return (
     <>
+      <Preloader settings={settings} />
       <Header settings={settings} menu={menu} />
       <main className="min-h-[60vh] pb-20 md:pb-0">{children}</main>
       <Footer settings={settings} menus={menus} />

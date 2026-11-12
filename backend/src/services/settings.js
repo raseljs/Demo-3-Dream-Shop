@@ -7,6 +7,8 @@ const DEFAULTS = {
     site_title: 'My Shop',
     tagline: 'Trusted source for 100% original products',
     logo: '',
+    logo_light: '',
+    preloader: 1,
     favicon: '',
     phone: '',
     whatsapp: '',

@@ -1,0 +1,110 @@
+@import "tailwindcss" source(none);
+
+/* Scan these folders for class names (explicit, so it works in any folder/path) */
+@source "../app";
+@source "../components";
+@source "../lib";
+
+/* Theme colours come from Admin → Settings → General (set as CSS variables on <html>) */
+@theme inline {
+  --color-primary: var(--primary);
+  --color-brand: var(--brand);
+  /* Bangla font is NOT in the main stack: every price has ৳, which would make every page download it (~80KB).
+     The phone/PC draws ৳ with its own font; Bangla headings/buttons use .font-bn */
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --primary: #fc6d04;
+  --brand: #0054cf;
+}
+
+@layer base {
+  body { @apply bg-white text-slate-800 antialiased; }
+  button, [role='button'] { cursor: pointer; }
+  input[type='number']::-webkit-inner-spin-button { opacity: 0.4; }
+}
+
+@layer components {
+  .container-x { @apply mx-auto w-full max-w-7xl px-3 md:px-4; }
+
+  /* Buttons */
+  .btn { @apply inline-flex h-11 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold whitespace-nowrap transition disabled:cursor-not-allowed disabled:opacity-60; }
+  .btn-sm { @apply h-9 rounded-lg px-3 text-xs; }
+  .btn-primary { @apply bg-primary text-white shadow-sm hover:opacity-90; }
+  .btn-brand { @apply bg-brand text-white shadow-sm hover:opacity-90; }
+  .btn-dark { @apply bg-slate-900 text-white hover:bg-slate-800; }
+  .btn-outline { @apply border border-slate-300 bg-white text-slate-700 hover:border-primary hover:text-primary; }
+  .btn-ghost { @apply text-slate-600 hover:bg-slate-100; }
+  .btn-danger { @apply bg-rose-600 text-white hover:bg-rose-700; }
+  .btn-success { @apply bg-emerald-600 text-white hover:bg-emerald-700; }
+  .btn-wa { @apply bg-[#25D366] text-white hover:opacity-90; }
+
+  /* Forms */
+  .input { @apply h-11 w-full rounded-xl border border-slate-300 bg-white px-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:bg-slate-50; }
+  textarea.input { @apply h-auto min-h-24 py-2.5; }
+  .input-sm { @apply h-9 rounded-lg text-xs; }
+  .label { @apply mb-1.5 block text-sm font-medium text-slate-700; }
+
+  .card { @apply rounded-2xl border border-slate-200 bg-white; }
+  .badge { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold whitespace-nowrap; }
+
+  /* Rich text from the admin editor */
+  .prose-content { @apply text-[15px] leading-7 text-slate-700; }
+  .prose-content h1, .prose-content h2 { @apply mt-6 mb-3 text-xl font-bold text-slate-900; }
+  .prose-content h3, .prose-content h4 { @apply mt-5 mb-2 text-lg font-semibold text-slate-900; }
+  .prose-content p { @apply my-3; }
+  .prose-content ul { @apply my-3 list-disc pl-6; }
+  .prose-content ol { @apply my-3 list-decimal pl-6; }
+  .prose-content li { @apply my-1; }
+  .prose-content a { @apply text-primary underline; }
+  .prose-content img { @apply my-4 h-auto max-w-full rounded-xl; }
+  .prose-content table { @apply my-4 w-full border-collapse overflow-hidden rounded-xl text-sm; }
+  .prose-content td, .prose-content th { @apply border border-slate-200 px-3 py-2 text-left; }
+  .prose-content tr:nth-child(odd) td { @apply bg-slate-50; }
+  .prose-content blockquote { @apply my-4 border-l-4 border-primary bg-slate-50 px-4 py-2 italic; }
+  .prose-content iframe { @apply my-4 aspect-video h-auto w-full rounded-xl; }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+
+@keyframes slide-in-right { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes slide-in-left { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.animate-slide-right { animation: slide-in-right 0.25s ease-out; }
+.animate-slide-left { animation: slide-in-left 0.25s ease-out; }
+.animate-fade { animation: fade-in 0.2s ease-out; }
+
+/* ── Fly to cart (lib/flyToCart.js) ───────────────────────── */
+.fly-to-cart-ghost {
+  position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
+  object-fit: contain; background: #fff; border-radius: 16px;
+  box-shadow: 0 18px 40px -12px rgba(15, 23, 42, 0.45);
+  will-change: transform, opacity; backface-visibility: hidden; contain: layout paint;
+}
+@keyframes cart-landing {
+  0% { transform: scale(1); } 30% { transform: scale(1.28); } 55% { transform: scale(0.92); }
+  75% { transform: scale(1.08); } 100% { transform: scale(1); }
+}
+.cart-landing { animation: cart-landing 0.46s cubic-bezier(0.3, 0.7, 0.4, 1.4); }
+@keyframes cart-badge-pop { 0% { transform: scale(0.4); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+.cart-badge-pop { animation: cart-badge-pop 0.38s cubic-bezier(0.3, 0.7, 0.4, 1.5); }
+
+/* ── Reveal on scroll (components/store/RevealOnScroll.js) ── */
+@keyframes reveal-rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+html[data-reveal-on] [data-reveal]:not([data-revealed]) { opacity: 0; }
+html[data-reveal-on] [data-reveal][data-revealed='1'] { animation: reveal-rise 0.85s cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0s) backwards; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-landing, .cart-badge-pop { animation: none !important; }
+  html[data-reveal-on] [data-reveal] { opacity: 1 !important; animation: none !important; }
+}
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; }
+}
+
+/* Bangla text (buttons, headings, landing pages) */
+.font-bn { font-family: var(--font-bangla), var(--font-poppins), ui-sans-serif, system-ui, sans-serif; }

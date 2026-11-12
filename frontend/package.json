@@ -1,0 +1,23 @@
+{
+  "name": "eshop-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack -p 3000",
+    "dev:webpack": "next dev -p 3000",
+    "build": "next build",
+    "start": "node server.js",
+    "start:next": "next start -p 3000",
+    "preview": "next build && next start -p 3000"
+  },
+  "dependencies": {
+    "next": "^15.5.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/postcss": "^4.1.0"
+  },
+  "engines": {
+    "node": ">=18.18"
+  }
+}

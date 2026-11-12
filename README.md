@@ -1,112 +1,115 @@
-# E-Shop — Next.js + Node.js ই-কমার্স (স্টোরফ্রন্ট + অ্যাডমিন প্যানেল + POS)
+# E-Shop — Next.js + Node.js E-commerce (Storefront + Admin Panel + POS)
 
-originalemart-এর ডিজাইন ও সব ফিচারের ক্লোন, কিন্তু **Next.js (ISR ক্যাশিং)** দিয়ে বানানো, তাই পেজ খুব দ্রুত খোলে।
-নিজের/ক্লায়েন্টের নাম, লোগো, রঙ আর প্রোডাক্ট অ্যাডমিন প্যানেল থেকেই বসানো যায় (কোড বদলাতে হয় না)।
+A clone of originalemart's design and all its features, but built with **Next.js (ISR caching)**, so pages open very fast.
+Your own or your client's name, logo, colours and products can all be set from the admin panel (no code changes needed).
 
 ```
 eshop/
 ├── backend/    → Express + MySQL REST API (Node.js app #1)
-└── frontend/   → Next.js 15 স্টোরফ্রন্ট + /admin প্যানেল (Node.js app #2)
+└── frontend/   → Next.js 15 storefront + /admin panel (Node.js app #2)
 ```
 
 ---
 
-## ১. কম্পিউটারে চালানো (লোকাল টেস্ট)
+## 1. Running on your computer (local testing)
 
-দরকার: **Node.js 22.13+ (বা 24)**। লোকালে MySQL লাগবে না — কোনো DB সেট না থাকলে (বা `DB_CLIENT=sqlite`) ব্যাকএন্ড
-`backend/database/local.sqlite` ফাইলে ডাটা রাখে, আর প্রথমবার চালু হওয়ার সময় নিজে থেকেই টেবিল + ডেমো ডাটা বানায়।
+Requirements: **Node.js 22.13+ (or 24)**. MySQL is not needed locally — if no database is configured (or `DB_CLIENT=sqlite`),
+the backend stores its data in `backend/database/local.sqlite`, and on first start it creates the tables + demo data automatically.
 
 ```bash
 # ---- Backend ----
 cd backend
-npm install                   # লোকালে .env লাগবে না — DB সেট না থাকলে অটো SQLite
-npm run dev                   # http://localhost:5000  (প্রথমবার ২০–৩০ সেকেন্ড লাগতে পারে)
+npm install                   # no .env needed locally — uses SQLite automatically if no DB is set
+npm run dev                   # http://localhost:5000  (first start can take 20–30 seconds)
 
-# ---- Frontend (নতুন টার্মিনালে) ----
+# ---- Frontend (in a new terminal) ----
 cd frontend
-npm install                   # লোকালে .env.local ছাড়াই http://localhost:5000-এ কানেক্ট করে
+npm install                   # connects to http://localhost:5000 without a .env.local
 npm run dev                   # http://localhost:3000
 ```
 
-MySQL দিয়ে লোকালে চালাতে চাইলে (XAMPP): `DB_CLIENT=mysql`, DB তথ্য বসিয়ে `npm run migrate` আর `npm run seed`।
+### Running locally with MySQL (XAMPP)
 
-অ্যাডমিন লগইন: **http://localhost:3000/login** → `.env`-এর `ADMIN_PHONE` / `ADMIN_PASSWORD`
-(ডিফল্ট `01700000000` / `admin12345` — লগইনের পর অবশ্যই বদলাবেন)। লগইনের পর অটো **/admin**-এ যাবে।
+Set `DB_CLIENT=mysql`, fill in the database details, then run `npm run migrate` and `npm run seed`:
 
----- Backend ----
+```bash
+# ---- Backend ----
 cd backend
-copy .env.example .env        # (Mac/Linux: cp .env.example .env) → DB নাম/ইউজার/পাসওয়ার্ড বসান
+copy .env.example .env        # (Mac/Linux: cp .env.example .env) → fill in DB name/user/password
 npm install
-npm run migrate               # টেবিল + Admin ইউজার তৈরি
-npm run seed                  # (ঐচ্ছিক) ডেমো প্রোডাক্ট, স্লাইডার, ক্যাটাগরি
+npm run migrate               # creates the tables + Admin user
+npm run seed                  # (optional) demo products, slider, categories
 npm run dev                   # http://localhost:5000
 
-# ---- Frontend (নতুন টার্মিনালে) ----
+# ---- Frontend (in a new terminal) ----
 cd frontend
 copy .env.example .env.local  # API_URL=http://localhost:5000, NEXT_PUBLIC_API_URL=http://localhost:5000
 npm install
 npm run dev                   # http://localhost:3000
 ```
 
-অ্যাডমিন লগইন: **http://localhost:3000/login** → `.env`-এর `ADMIN_PHONE` / `ADMIN_PASSWORD`
-(ডিফল্ট `01700000000` / `admin12345` — লগইনের পর অবশ্যই বদলাবেন)। লগইনের পর অটো **/admin**-এ যাবে।
+### Admin login
+
+**http://localhost:3000/login** → `ADMIN_PHONE` / `ADMIN_PASSWORD` from `.env`
+(default `01700000000` / `admin12345` — be sure to change it after logging in). After login you are redirected to **/admin** automatically.
 
 ---
 
-## ২. cPanel-এ ডিপ্লয় (দুটো Node.js App)
+## 2. Deploying on cPanel (two Node.js apps)
 
-**ক) ডাটাবেস:** cPanel → MySQL Databases → নতুন DB + ইউজার বানিয়ে ALL PRIVILEGES দিন।
+**a) Database:** cPanel → MySQL Databases → create a new database + user and grant ALL PRIVILEGES.
 
-**খ) Backend (যেমন `api.yourshop.com`):**
-1. `backend` ফোল্ডার আপলোড করুন (যেমন `/home/USER/eshop/backend`)।
-2. cPanel → **Setup Node.js App** → Create: Application root = `eshop/backend`, URL = `api.yourshop.com`, Startup file = `server.js`, Node 20+।
-3. Environment variables-এ `.env.example`-এর সব ভ্যারিয়েবল বসান (`DB_CLIENT=mysql`, DB, `JWT_SECRET`, `REVALIDATE_SECRET`, `BACKEND_URL=https://api.yourshop.com`, `FRONTEND_URL=https://yourshop.com`, `NODE_ENV=production`)।
-4. **Run NPM Install** → তারপর Terminal-এ (app-এর virtualenv কমান্ড দিয়ে ঢুকে) `npm run migrate` আর চাইলে `npm run seed` → **Restart**।
-5. `https://api.yourshop.com/api/health` খুললে `{"ok":true}` দেখাবে।
+**b) Backend (e.g. `api.yourshop.com`):**
+1. Upload the `backend` folder (e.g. `/home/USER/eshop/backend`).
+2. cPanel → **Setup Node.js App** → Create: Application root = `eshop/backend`, URL = `api.yourshop.com`, Startup file = `server.js`, Node 20+.
+3. Under Environment variables, add every variable from `.env.example` (`DB_CLIENT=mysql`, DB details, `JWT_SECRET`, `REVALIDATE_SECRET`, `BACKEND_URL=https://api.yourshop.com`, `FRONTEND_URL=https://yourshop.com`, `NODE_ENV=production`).
+4. **Run NPM Install** → then in the Terminal (after entering the app's virtualenv command) run `npm run migrate`, and `npm run seed` if you want demo data → **Restart**.
+5. Opening `https://api.yourshop.com/api/health` should show `{"ok":true}`.
 
-**গ) Frontend (`yourshop.com`):**
-1. `frontend` ফোল্ডার আপলোড → Setup Node.js App: root = `eshop/frontend`, URL = `yourshop.com`, Startup file = `server.js`।
-2. Environment variables: `API_URL=https://api.yourshop.com`, `NEXT_PUBLIC_API_URL=https://api.yourshop.com`, `NEXT_PUBLIC_SITE_URL=https://yourshop.com`, `REVALIDATE_SECRET=` (backend-এর সাথে একই), `NODE_ENV=production`।
-3. **Run NPM Install** → Terminal-এ `npm run build` → **Restart**।
-   - শেয়ার্ড হোস্টিং-এ RAM কম হলে build আটকে যেতে পারে। তখন নিজের কম্পিউটারে একই `.env.local` দিয়ে `npm run build` করে পুরো `.next` ফোল্ডার আপলোড করুন।
-   - `NEXT_PUBLIC_*` ভ্যারিয়েবল build-এর সময় কোডে বসে যায় — বদলালে আবার build করতে হবে।
-4. Backend চালু থাকা অবস্থায় build করুন, যাতে প্রথম পেজগুলো ডাটা সহ তৈরি হয়।
+**c) Frontend (`yourshop.com`):**
+1. Upload the `frontend` folder → Setup Node.js App: root = `eshop/frontend`, URL = `yourshop.com`, Startup file = `server.js`.
+2. Environment variables: `API_URL=https://api.yourshop.com`, `NEXT_PUBLIC_API_URL=https://api.yourshop.com`, `NEXT_PUBLIC_SITE_URL=https://yourshop.com`, `REVALIDATE_SECRET=` (same as the backend's), `NODE_ENV=production`.
+3. **Run NPM Install** → run `npm run build` in the Terminal → **Restart**.
+   - On shared hosting with little RAM the build may get stuck. In that case, run `npm run build` on your own computer with the same `.env.local` and upload the whole `.next` folder.
+   - `NEXT_PUBLIC_*` variables are baked into the code at build time — if you change them, you have to build again.
+4. Build while the backend is running, so the first pages are generated with real data.
 
-> **কেন দ্রুত:** প্রতিটা পেজ একবার সার্ভারে তৈরি হয়ে ক্যাশ থাকে (ISR)। অ্যাডমিনে কিছু বদলালে backend নিজে থেকে
-> `/revalidate` কল করে শুধু সংশ্লিষ্ট পেজগুলো রিফ্রেশ করে। ছবি অটো WebP/সঠিক সাইজে রিসাইজ হয় (next/image),
-> কোনো jQuery/বড় লাইব্রেরি নেই — ব্রাউজারে খুব কম JavaScript যায়।
-
----
-
-## ৩. ফিচার লিস্ট
-
-**স্টোরফ্রন্ট:** হিরো স্লাইডার (ডেস্কটপ/মোবাইল আলাদা ছবি, ভিডিও), প্রোমো ব্যানার, ট্রাস্ট বার, ফিচার্ড ক্যাটাগরি,
-ক্যাটাগরি-ভিত্তিক প্রোডাক্ট সেকশন, লাইভ সার্চ, শপ পেজ (ক্যাটাগরি/ব্র্যান্ড/দাম ফিল্টার, সর্ট, ১৬/২৪/৩৬ প্রতি পেজ),
-প্রোডাক্ট পেজ (গ্যালারি+জুম, সাইজ/কালার ভ্যারিয়েশন, স্টক, “অর্ডার করুন”, Add to Cart, Call/WhatsApp অর্ডার, সাইজ চার্ট,
-রিভিউ, রিলেটেড প্রোডাক্ট, SEO schema), কার্ট ড্রয়ার, চেকআউট (Inside/Outside Dhaka চার্জ, কুপন, COD/bKash/SSLCommerz),
-অর্ডার সাকসেস/ইনভয়েস, অর্ডার ট্র্যাক (অর্ডার নং বা ফোন), কাস্টমার লগইন/রেজিস্টার (OTP ঐচ্ছিক), কাস্টমার ড্যাশবোর্ড,
-স্ট্যাটিক পেজ, ল্যান্ডিং পেজ (`/campaign/...`), sitemap.xml, robots.txt, Facebook Pixel/GA-এর জন্য Custom Code।
-
-**অ্যাডমিন (`/admin`):** ড্যাশবোর্ড (তারিখ ফিল্টার, ৩০ দিনের চার্ট), **POS** (বারকোড/SKU সার্চ, ওয়াক-ইন/ডেলিভারি, ইনভয়েস প্রিন্ট),
-ব্র্যান্ড, ক্যাটাগরি (সাব-ক্যাটাগরি), প্রোডাক্ট (Simple/Variable, Generate Variations, গ্যালারি, ভিডিও, শিপিং/VAT, SEO, Duplicate),
-অ্যাট্রিবিউট, সাইজ চার্ট, **লেবেল প্রিন্ট (Code128 বারকোড)**, অর্ডার (স্ট্যাটাস ট্যাব, বাল্ক স্ট্যাটাস/অ্যাসাইন, Pathao/Steadfast-এ পাঠানো,
-ফ্রড চেক, CSV এক্সপোর্ট, বাল্ক ইনভয়েস), **Incomplete orders** (চেকআউটে ফোন দিয়ে অর্ডার না করা কাস্টমার), রিটার্ন (রিস্টক+রিফান্ড),
-খরচ ও খরচের ক্যাটাগরি, রিপোর্ট (Profit & Loss, Sales, City-wise, Products), ল্যান্ডিং পেজ বিল্ডার, কুপন, ইউজার, ব্লকলিস্ট,
-রোল-পারমিশন, প্রোডাক্ট রিভিউ মডারেশন, মেনু বিল্ডার, স্লাইডার, পেজ এডিটর, সেটিংস (General, Shipping, Courier, Payment, SMS)।
+> **Why it's fast:** Each page is generated once on the server and then cached (ISR). When you change something in the admin panel,
+> the backend automatically calls `/revalidate` to refresh only the affected pages. Images are automatically converted to WebP and
+> resized to the right size (next/image), and there is no jQuery or other heavy library — very little JavaScript reaches the browser.
 
 ---
 
-## ৪. যেগুলো আপনার নিজের অ্যাকাউন্ট দিয়ে টেস্ট করতে হবে
+## 3. Feature list
 
-কোড ডকুমেন্টেড API অনুযায়ী লেখা, কিন্তু আসল credential ছাড়া এগুলো টেস্ট করা যায়নি — প্রথমে sandbox মোডে চেক করুন:
-- **Pathao / Steadfast** (Settings → Courier) — Steadfast-এর base URL ডিফল্ট `https://portal.packzy.com/api/v1`
+**Storefront:** Hero slider (separate desktop/mobile images, video), promo banners, trust bar, featured categories,
+category-based product sections, live search, shop page (category/brand/price filters, sorting, 16/24/36 per page),
+product page (gallery + zoom, size/colour variations, stock, "Order now", Add to Cart, Call/WhatsApp ordering, size chart,
+reviews, related products, SEO schema), cart drawer, checkout (Inside/Outside Dhaka delivery charges, coupons, COD/bKash/SSLCommerz),
+order success/invoice, order tracking (by order number or phone), customer login/register (optional OTP), customer dashboard,
+static pages, landing pages (`/campaign/...`), sitemap.xml, robots.txt, Custom Code for Facebook Pixel/GA.
+
+**Admin (`/admin`):** Dashboard (date filter, 30-day chart), **POS** (barcode/SKU search, walk-in/delivery, invoice printing),
+brands, categories (with sub-categories), products (Simple/Variable, Generate Variations, gallery, video, shipping/VAT, SEO, Duplicate),
+attributes, size charts, **label printing (Code128 barcodes)**, orders (status tabs, bulk status change/assign, send to Pathao/Steadfast,
+fraud check, CSV export, bulk invoices), **Incomplete orders** (customers who entered a phone number at checkout but didn't place an order),
+returns (restock + refund), expenses and expense categories, reports (Profit & Loss, Sales, City-wise, Products), landing page builder,
+coupons, users, blocklist, role permissions, product review moderation, menu builder, slider, page editor,
+settings (General, Shipping, Courier, Payment, SMS).
+
+---
+
+## 4. Things to test with your own accounts
+
+The code follows each service's documented API, but these could not be tested without real credentials — check them in sandbox mode first:
+- **Pathao / Steadfast** (Settings → Courier) — Steadfast's default base URL is `https://portal.packzy.com/api/v1`
 - **bKash Tokenized / SSLCommerz** (Settings → Payment)
-- **BulkSMSBD / Custom SMS** (Settings → SMS) এবং **BD Courier fraud check** API key (Settings → General)
+- **BulkSMSBD / Custom SMS** (Settings → SMS) and the **BD Courier fraud check** API key (Settings → General)
 
 ---
 
-## ৫. দরকারি তথ্য
-- ছবি আপলোড হয় `backend/uploads/`-এ (JPG/PNG/WEBP/GIF, স্লাইডারে MP4)। এই ফোল্ডার ব্যাকআপে রাখুন।
-- `backend/uploads/demo/` শুধু ডেমো ছবি — আসল প্রোডাক্ট দেওয়ার পর মুছে ফেলতে পারেন।
-- রঙ বদলাতে: Settings → General → Primary colour / Header colour।
-- নতুন স্টাফ: Users → Add New → Role বেছে দিন (Roles পেজে কে কোন সেকশন দেখবে ঠিক করুন)।
+## 5. Useful information
+- Images are uploaded to `backend/uploads/` (JPG/PNG/WEBP/GIF, plus MP4 for the slider). Keep this folder in your backups.
+- `backend/uploads/demo/` contains demo images only — you can delete it once you've added real products.
+- To change colours: Settings → General → Primary colour / Header colour.
+- To add staff: Users → Add New → choose a Role (use the Roles page to set which sections each role can see).

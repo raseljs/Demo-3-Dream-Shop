@@ -1,10 +1,14 @@
 node_modules/
 .next/
-.env.local
+
+# Environment files: real secrets never go to GitHub, only the .env.example templates
 .env
-node_modules/
-.env
+.env.*
+!.env.example
+
 uploads/*
 !uploads/demo/
-database/*.sqlite*
+
+# Local SQLite database (also the -wal / -shm files)
+backend/database/*.sqlite*
 backups/
